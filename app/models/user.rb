@@ -1,5 +1,5 @@
 class User < ActiveRecord::Base
-  
+
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
 
   before_save { self.email = email.downcase }
@@ -11,4 +11,21 @@ class User < ActiveRecord::Base
   validates :password, presence: true, length: { minimum: 6 }
   has_secure_password
 
+  # Returns the hash digest of the given string.
+  def self.digest(string)
+    cost = ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                                  BCrypt::Engine.cost
+    BCrypt::Password.create(string, cost: cost)
+  end
+
+  #######################
+  ### PRIVATE METHODS ###
+  #######################
+
+  private
+
+    def cost
+      ActiveModel::SecurePassword.min_cost ? BCrypt::Engine::MIN_COST :
+                                             BCrypt::Engine.cost
+    end
 end
